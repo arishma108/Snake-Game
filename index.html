@@ -1,77 +1,584 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>HISS</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
-      integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU="
-      crossorigin="anonymous"
-    />
-    <style>
-      body {
-        display: flex;
-        width: 100vw;
-        height: 100vh;
-        align-content: center;
-        justify-content: center;
-        align-items: center;
-        justify-items: center;
-        background: #222831;
-        flex-direction: column;
-      }
-      div {
-        text-align: left;
-        width: 500px;
-        display: flex;
-        align-items: center;
-        justify-content: space-around;
-      }
-      @media only screen and (max-width: 500px) {
-        div {
-          width: 100vw;
-        }
-        h1 {
-          font-size: 20px;
-        }
-        button {
-          font-size: 20px;
-        }
-      }
-      h1 {
-        color: #ffffff;
-        font-size: 30px;
-      }
-      button {
-        background: transparent;
-        color: #1d37ff;
-        border: none;
-        font-size: 30px;
-        cursor: pointer;
-      }
-      button:hover {
-        text-decoration: underline;
-        color: #ffffff;
-      }
-      canvas {
-        border: solid 1px #ff971d;
-      }
-    </style>
-  </head>
-  <body>
-    <div>
-      <h1>Score: <span id="score"></span></h1>
-      <button onclick="initialState()">restart</button>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <title>HISS</title>
+
+  <style media="screen">
+  
+    .body {
+      background: #222;
+      color: #fff;
+      font-family: sans-serif;
+      font-weight: 100;
+      font-size: .6em;
+      letter-spacing: 20;
+      text-align: center;
+      line-height: 2;
+      overflow: hidden;
+    }
+    
+    .X {
+      display: flex;
+    }
+   
+    .Y {
+      width: 14px;
+      height: 14px;
+      background-color: #2a2a2a;
+      border-radius: 5px;
+      margin: 8px;
+      transition: all .1s ease-out;
+    }
+   
+    .active1,
+    .active2,
+    .head1,
+    .head2,
+    .pom {
+      width: 22px;
+      height: 22px;
+      margin: 4px;
+    }
+   
+    .active1,
+    .head1 {
+      background: red;
+    }
+    .active2,
+    .head2 {
+      background: white;
+    }
+    .head1.active1,
+    .head1.active2,
+    .head2.active2,
+    .head2.active1,
+    .head1.head2 {
+      background-color: #fff;
+    }
+    .pom {
+      background: #fff;
+    }
+   
+    .Ynone {
+      width: 0;
+      height: 0;
+      border-radius: 20px;
+      margin: 15px;
+    }
+ 
+    .game {
+      display: none;
+      height: 100%;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+   
+    .title1,
+    .title2,
+    .h1,
+    .h2 {
+      position: absolute;
+      right: 0;
+      left: 0;
+      opacity: 0;
+      transition: all .2s ease-out;
+    }
+    .title1 {
+      top: calc(30vh - 20px);
+    }
+    .title2,
+    .h1 {
+      top: 30vh;
+    }
+    .h2 {
+      top: 60vh;
+      color: #888;
+    }
+    .translateY {
+      opacity: 1;
+      transform: translateY(-10px);
+    }
+    .cheatcode {
+      position: absolute;
+      top: 20px;
+      left: 0;
+      height: 50px;
+      width: 100%;
+      opacity: 0;
+      transition: opacity 2s ease;
+    }
+    .gifContainer {
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      height: 100%;
+      width: 45%;
+    }
+    .teamMember {
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body class="body">
+
+  <p class="title1">TRAIL</p>
+  <p class="title2">BREAKER</p>
+  <p class="h1"></p>
+  <p class="h2">PRESS SPACE</p>
+
+  <div class="game"></div>
+
+  <!-- cheat -->
+  <div class="cheatCode">
+    <div class="gifContainer">
+      <img src="img/valentine.gif" alt="valentine" class="teamMember">
+      <img src="img/quentin.gif" alt="quentin" class="teamMember">
+      <img src="img/nicolas.gif" alt="nicolas" class="teamMember">
+      <img src="img/theodore.gif" alt="theodore" class="teamMember">
+      <img src="img/son.gif" alt="son" class="teamMember">
+      <img src="img/mahel.gif" alt="mahel" class="teamMember">
+      <img src="img/christella.gif" alt="christella" class="teamMember">
     </div>
-    <canvas
-      height="500"
-      width="500"
-      id="gamePlay"
-      style=" background: #393e46;"
-    ></canvas>
-  </body>
+  </div>
+
+<!-- //////////////////////////////////////////////////////////////////////// -->
+
+<script type="text/javascript">
+
+  Init()
+  TextShow([title1, title2, h2])
+
+  window.setTimeout(function() {
+    window.addEventListener('keydown', function(event) {
+      switch (event.which) {
+        case 32: if (pause=='') {Reset()} else if (pause=='off') {Pause()} else {Unpause()}
+        case 81:
+        case 68:
+        case 90:
+        case 83: Events1(event.which);
+        case 37:
+        case 39:
+        case 38:
+        case 40: Events2(event.which);
+      }
+      cheatCodeActivation();
+    });
+  }, 800)
+
+  var loop = function() {
+    RemoveClasses()
+    ResetChangedDir()
+    MoveSnakes()
+    UpdateBloks()
+    AddClasses()
+    CheckCrash()
+    CheckApple()
+  }
+ 
+  var title1, title2, h1, h2, game, gridWidth, gridHeight, tabX, tabY,
+      pom, pomX, pomY, maxLengthDefault, looping,
+      snake1 = new Object(),
+      snake2 = new Object(),
+      snakes = [snake1, snake2]
+      pause=''
+
+  function Init() {
+ 
+    title1 = document.querySelector('.title1');
+    title2 = document.querySelector('.title2');
+    h1 = document.querySelector('.h1');
+    h2 = document.querySelector('.h2');
+    game = document.querySelector('.game');
+   
+    gridWidth = 25;
+    gridHeight = 25;
+   
+    for (var i = 0; i < gridHeight; i++) {
+      game.innerHTML += "<div class='X'></div>";
+    }
+   
+    tabX = document.querySelectorAll('.X');
+    
+    for (var i = 0; i < tabX.length; i++) {
+      for (var i2 = 0; i2 < gridWidth; i2++) {
+        tabX[i].innerHTML += "<div class='Y'></div>";
+      }
+    }
+  
+    tabY = document.querySelectorAll('.Y');
+  
+    maxLengthDefault = 6;
+  }
+  
+  function Reset() {
+    
+    for (var i = 0; i < snakes.length; i++) {
+   
+      if (snakes[i] === snake1) {
+       
+        snakes[i].active = document.querySelectorAll('.active1');
+      
+        snakes[i].X = Math.floor((tabX.length/2))-1;
+        snakes[i].Y = 0;
+       
+        snakes[i].dir = 'right';
+      } 
+      else {
+       
+        snakes[i].active = document.querySelectorAll('.active2');
+       
+        snake2.X = Math.floor((tabX.length/2))+1;
+        snake2.Y = (tabY.length / tabX.length) - 1;
+       
+      }
+    
+     
+      snakes[i].blocks = [tabY[snakes[i].Y + snakes[i].X * (tabY.length / tabX.length)]];
+    
+      snakes[i].maxLength = maxLengthDefault;
+      snakes[i].crashSelf = false
+      snakes[i].crashOpp = false
+    }
+   
+    h1.style.color = 'white';
+    TextHide([title1, title2, h1, h2])
+   
+    game.style.display = "flex";
+   
+    NewPom()
+ 
+    EndAnim('off')
+   
+    ResetChangedDir()
+    RemoveClasses()
+    AddClasses()
+    window.clearInterval(looping);
+    looping = window.setInterval(loop, 125);
+    pause= 'off';  //permet la FONCTION Pause()
+  }
+
+
+  function Pause() {
+    pause = 'on';  //permet la FONCTION Unpause()
+    window.clearInterval(looping);
+    h1.textContent = 'PAUSE';
+    h1.style.color = 'white';
+    TextShow([h1, h2])
+  }
+
+  function Unpause() {
+    pause = 'off';  //permet la FONCTION Pause ()
+    looping = window.setInterval(loop, 125);
+    TextHide([h1, h2])
+  }
+
+
+   function RemoveClasses() {
+    snake1.active = document.querySelectorAll('.active1');
+    for (var i = 0; i < snake1.active.length; i++) {
+      snake1.active[i].classList.remove('active1');
+    }
+    snake2.active = document.querySelectorAll('.active2');
+    for (var i = 0; i < snake2.active.length; i++) {
+      snake2.active[i].classList.remove('active2');
+    } 
+    snake1.head = document.querySelectorAll('.head1');
+    for (var i = 0; i < snake1.head.length; i++) {
+      snake1.head[i].classList.remove('head1');
+    }
+    snake2.head = document.querySelectorAll('.head2');
+    for (var i = 0; i < snake2.head.length; i++) {
+      snake2.head[i].classList.remove('head2');
+    }
+  }
+ 
+  function ResetChangedDir() {
+    snake1.changedDir = 0;
+    snake2.changedDir = 0;
+   
+  }
+  
+  function MoveSnakes() {
+    for (var i = 0; i < snakes.length; i++) {
+      switch (snakes[i].dir) {
+       
+        case 'left':
+        
+          if (snakes[i].Y % (tabY.length / tabX.length) == 0) {
+           
+            snakes[i].Y += (tabY.length / tabX.length) - 1;
+          }
+         
+          else {
+         
+            snakes[i].Y -= 1;
+          }
+          break;
+        
+        case 'right':
+          if ((snakes[i].Y + 1) % (tabY.length / tabX.length) == 0) {
+            snakes[i].Y -= (tabY.length / tabX.length) - 1;
+          } else {
+            snakes[i].Y += 1;
+          }
+          break;
+       
+        case 'top':
+          if (snakes[i].X === 0) {
+            snakes[i].X += tabX.length - 1;
+          } else {
+            snakes[i].X -= 1;
+          }
+          break;
+       
+        case 'bottom':
+          if (snakes[i].X === tabX.length - 1) {
+            snakes[i].X -= tabX.length - 1;
+          } else {
+            snakes[i].X += 1;
+          }
+      }
+    }
+  }
+  
+  function UpdateBloks() {
+    for (var i = 0; i < snakes.length; i++) {
+      
+      snakes[i].blocks.push(tabY[snakes[i].Y + snakes[i].X * (tabY.length / tabX.length)]);
+     
+      if (snakes[i].blocks.length > snakes[i].maxLength) {
+        snakes[i].blocks.shift();
+      }
+    }
+  }
+ 
+  function AddClasses() {
+    
+    for (var i1 = 0; i1 < snake1.blocks.length; i1++) {
+      
+      if (snake1.blocks[i1] === snake1.blocks[snake1.blocks.length - 1]) {
+        if (snake1.blocks[i1].classList.contains('head1')) {
+          snake1.blocks[i1].classList.add('active1');
+        } else {
+          snake1.blocks[i1].classList.add('head1')
+        }
+      
+      } else{
+        snake1.blocks[i1].classList.add('active1');
+      }
+    }
+   
+    for (var i1 = 0; i1 < snake2.blocks.length; i1++) {
+      if (snake2.blocks[i1] === snake2.blocks[snake2.blocks.length - 1]) {
+        if (snake2.blocks[i1].classList.contains('head2')) {
+          snake2.blocks[i1].classList.add('active2');
+        } else {
+          snake2.blocks[i1].classList.add('head2')
+        }
+      } else {
+        snake2.blocks[i1].classList.add('active2');
+      }
+    }
+  }
+ 
+  function CheckCrash() {
+    // la classe .active_ est sur chacun des blocs de queue
+    // la classe .head_ est sur la tête
+    // En regardant s'il exsite des div avec plusieurs classes à la fois -
+    // on sait qui s'est cogné à quoi
+    if (document.querySelector('.head1.active1')) {
+      snake1.crashSelf = true
+    } else if (document.querySelector('.head1.active2')) {
+      snake1.crashOpp = true
+    }
+    if (document.querySelector('.head2.active2')) {
+      snake2.crashSelf = true
+    } else if (document.querySelector('.head2.active1')) {
+      snake2.crashOpp = true
+    }
+    if (document.querySelector(".head1.head2")) {
+      snake1.crashOpp = true
+      snake2.crashOpp = true
+    }
+   
+    if (snake1.crashSelf || snake1.crashOpp || snake2.crashSelf || snake2.crashOpp) {
+      
+      if ((snake1.crashSelf || snake1.crashOpp) && (snake2.crashSelf || snake2.crashOpp)) {
+        h1.textContent = '- DRAW -';
+      } 
+      else if (snake1.crashSelf || snake1.crashOpp) {
+        h1.textContent = '- P2 WINS -';
+        h1.style.color = 'cyan';
+      } 
+      else if (snake2.crashSelf || snake2.crashOpp) {
+        h1.textContent = '- P1 WINS -';
+        h1.style.color = 'yellow';
+      }
+      
+      window.setTimeout(EndAnim, 400);
+   
+      window.setTimeout(function() {
+        TextShow([h1, h2])
+      }, 1000)
+      
+      window.clearInterval(looping);
+      pause=''; //empêche la FONCTION Pause
+    }
+  }
+  
+  function CheckApple() {
+    
+    if (document.querySelector('.head1.pom')) {
+      snake1.eat = true
+    } else if (document.querySelector('.head2.pom')){
+      snake2.eat = true
+    }
+    for (var i = 0; i < snakes.length; i++) {
+      
+      if (snakes[i].eat) {
+        
+        snakes[i].maxLength += 2
+     
+        snakes[i].eat = false
+    
+        NewPom()
+      }
+    }
+  }
+ 
+  function NewPom() {
+    
+    pom = document.querySelector('.pom');
+    if (document.querySelector('.pom')) {
+      pom.classList.remove('pom');
+    }
+    // Génère aléatoirement les coordonnées de la nouvelle pomme ----
+    pomX = Math.floor(Math.random() * tabX.length);
+    pomY = Math.floor(Math.random() * (tabY.length / tabX.length));
+    // Ajoute la classe .pom à l'élément correspondant dans `tabY` --
+    tabY[pomY + pomX * tabX.length].classList.add('pom');
+  }
+  
+  function EndAnim(turn) {
+    if (!turn) {
+      turn = 'on'
+    }
+    switch (turn) {
+      
+      case 'on':
+       
+        for (var i = 0; i < tabY.length; i++) {
+          tabY[i].style.transitionDuration = '.6s';
+          tabY[i].style.transitionTimingFunction = 'ease-in-out';
+         
+          tabY[i].classList.add('Ynone');
+        }
+        break;
+   
+      case 'off':
+        // Remet tout bien ......................
+        for (var i = 0; i < tabY.length; i++) {
+          tabY[i].style.transitionDuration = '';
+          tabY[i].style.transitionTimingFunction = '';
+          tabY[i].classList.remove('Ynone');
+        }
+        h1.style.transitionDuration = '';
+        h2.style.transitionDuration = '';
+    }
+  }
+  
+  function Events1(key) {
+   
+    if (snake1.changedDir === 0 && ((key === 81 && snake1.dir !== 'right') || (key === 68 && snake1.dir !== 'left') || (key === 90 && snake1.dir !== 'bottom') || (key === 83 && snake1.dir !== 'top'))) {
+      // Change la direction ....................
+      switch (key) {
+        case 81: snake1.dir = 'left'; break;
+        case 68: snake1.dir = 'right'; break;
+        case 90: snake1.dir = 'top'; break;
+        case 83: snake1.dir = 'bottom'; break;
+      }
+      
+      snake1.changedDir = 1;
+    }
+  }
+ 
+  function Events2(key) {
+    if (snake2.changedDir === 0 && ((key === 37 && snake2.dir !== 'right') || (key === 39 && snake2.dir !== 'left') || (key === 38 && snake2.dir !== 'bottom') || (key === 40 && snake2.dir !== 'top'))) {
+      switch (key) {
+        case 37: snake2.dir = 'left'; break;
+        case 39: snake2.dir = 'right'; break;
+        case 38: snake2.dir = 'top'; break;
+        case 40: snake2.dir = 'bottom'; break;
+      }
+      snake2.changedDir = 1;
+    }
+  }
+
+  
+  var cheat = document.querySelector('.cheatCode');
+  var saucisse = 0;
+  var cheatCodeActivation = function() {
+    if (saucisse != 8) {
+      switch (event.which) {
+        case 83: if (saucisse==0 || saucisse==5 || saucisse==6) {saucisse++; break;} else {saucisse=0;}
+        case 65: if (saucisse==1) {saucisse++; break;} else {saucisse=0;}
+        case 85: if (saucisse==2) {saucisse++; break;} else {saucisse=0;}
+        case 67: if (saucisse==3) {saucisse++; break;} else {saucisse=0;}
+        case 73: if (saucisse==4) {saucisse++; break;} else {saucisse=0;}
+        case 69: if (saucisse==7) {saucisse++;
+          game.style.display = 'none';
+          cheat.style.opacity = '1';
+          h1.textContent = 'CHEAT CODE ACTIVATED';
+          h1.style.color = 'red';
+          TextHide([title1, title2])
+          TextShow([h1])
+          pause = '';
+          window.clearInterval(looping);
+          break;} else {saucisse=0;}
+        default: saucisse=0;
+      }
+    }
+  }
+
+  
+  function TextTranlate(text, mode) {
+    switch (mode) {
+      case 'on':
+        text.style.transitionDuration = '.5s'
+        text.classList.add('translateY')
+        break
+      case 'off':
+        text.style.transitionDuration = ''
+        text.classList.remove('translateY')
+    }
+  }
+
+  
+  function TextShow(texts) {
+    var counter = 200
+    for (let i = 0; i < texts.length; i++) {
+      window.setTimeout(function() {
+        TextTranlate(texts[i], 'on')
+      }, counter)
+      counter += 200
+    }
+  }
+
+  
+  function TextHide(texts) {
+    for (var i = 0; i < texts.length; i++) {
+      TextTranlate(texts[i], 'off')
+    }
+  }
+
+  </script>
+</body>
+
+</html>
   <script src="index.js"></script>
 </html>
