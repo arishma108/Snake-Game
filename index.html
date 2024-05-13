@@ -7,7 +7,7 @@
   <title>HISS</title>
 
   <style media="screen">
-  
+   
     .body {
       background: #222;
       color: #fff;
@@ -19,11 +19,11 @@
       line-height: 2;
       overflow: hidden;
     }
-    
+   
     .X {
       display: flex;
     }
-   
+    
     .Y {
       width: 14px;
       height: 14px;
@@ -32,7 +32,7 @@
       margin: 8px;
       transition: all .1s ease-out;
     }
-   
+    
     .active1,
     .active2,
     .head1,
@@ -42,14 +42,14 @@
       height: 22px;
       margin: 4px;
     }
-   
+    
     .active1,
     .head1 {
       background: red;
     }
     .active2,
     .head2 {
-      background: white;
+      background: green;
     }
     .head1.active1,
     .head1.active2,
@@ -68,7 +68,7 @@
       border-radius: 20px;
       margin: 15px;
     }
- 
+    
     .game {
       display: none;
       height: 100%;
@@ -126,27 +126,27 @@
 
 <body class="body">
 
-  <p class="title1">HISS</p>
-  <p class="title2">DMOSS</p>
+  <p class="title1">ENTER</p>
+  <p class="title2">D-MOSS</p>
   <p class="h1"></p>
   <p class="h2">PRESS SPACE</p>
 
   <div class="game"></div>
 
-  <!-- cheat -->
+  
   <div class="cheatCode">
     <div class="gifContainer">
-      <img src="img/valentine.gif" alt="valentine" class="teamMember">
-      <img src="img/quentin.gif" alt="quentin" class="teamMember">
-      <img src="img/nicolas.gif" alt="nicolas" class="teamMember">
-      <img src="img/theodore.gif" alt="theodore" class="teamMember">
-      <img src="img/son.gif" alt="son" class="teamMember">
-      <img src="img/mahel.gif" alt="mahel" class="teamMember">
-      <img src="img/christella.gif" alt="christella" class="teamMember">
+      <img src="img/vine.gif" alt="vine" class="teamMember">
+      <img src="img/tin.gif" alt="tin" class="teamMember">
+      <img src="img/cola.gif" alt="cola" class="teamMember">
+      <img src="img/ore.gif" alt="ore" class="teamMember">
+      <img src="img/on.gif" alt="on" class="teamMember">
+      <img src="img/hell.gif" alt="hell" class="teamMember">
+      <img src="img/rise.gif" alt="rise" class="teamMember">
     </div>
   </div>
 
-<!-- //////////////////////////////////////////////////////////////////////// -->
+
 
 <script type="text/javascript">
 
@@ -186,22 +186,22 @@
       snake2 = new Object(),
       snakes = [snake1, snake2]
       pause=''
-
+  
   function Init() {
- 
+    
     title1 = document.querySelector('.title1');
     title2 = document.querySelector('.title2');
     h1 = document.querySelector('.h1');
     h2 = document.querySelector('.h2');
     game = document.querySelector('.game');
-   
+    
     gridWidth = 25;
     gridHeight = 25;
-   
+    
     for (var i = 0; i < gridHeight; i++) {
       game.innerHTML += "<div class='X'></div>";
     }
-   
+    
     tabX = document.querySelectorAll('.X');
     
     for (var i = 0; i < tabX.length; i++) {
@@ -209,37 +209,37 @@
         tabX[i].innerHTML += "<div class='Y'></div>";
       }
     }
-  
+    
     tabY = document.querySelectorAll('.Y');
-  
+    
     maxLengthDefault = 6;
   }
   
   function Reset() {
     
     for (var i = 0; i < snakes.length; i++) {
-   
-      if (snakes[i] === snake1) {
-       
-        snakes[i].active = document.querySelectorAll('.active1');
       
+      if (snakes[i] === snake1) {
+        
+        snakes[i].active = document.querySelectorAll('.active1');
+       
         snakes[i].X = Math.floor((tabX.length/2))-1;
         snakes[i].Y = 0;
-       
+        
         snakes[i].dir = 'right';
       } 
       else {
-       
+        
         snakes[i].active = document.querySelectorAll('.active2');
        
         snake2.X = Math.floor((tabX.length/2))+1;
         snake2.Y = (tabY.length / tabX.length) - 1;
-       
+        
+        snakes[i].dir = 'left';
       }
-    
-     
+      
       snakes[i].blocks = [tabY[snakes[i].Y + snakes[i].X * (tabY.length / tabX.length)]];
-    
+      
       snakes[i].maxLength = maxLengthDefault;
       snakes[i].crashSelf = false
       snakes[i].crashOpp = false
@@ -247,37 +247,37 @@
    
     h1.style.color = 'white';
     TextHide([title1, title2, h1, h2])
-   
+    
     game.style.display = "flex";
-   
+    
     NewPom()
- 
-    EndAnim('off')
    
+    EndAnim('off')
+    
     ResetChangedDir()
     RemoveClasses()
     AddClasses()
     window.clearInterval(looping);
     looping = window.setInterval(loop, 125);
-    pause= 'off';  //permet la FONCTION Pause()
+    pause= 'off';  
   }
 
-
+  
   function Pause() {
-    pause = 'on';  //permet la FONCTION Unpause()
+    pause = 'on'; 
     window.clearInterval(looping);
     h1.textContent = 'PAUSE';
     h1.style.color = 'white';
     TextShow([h1, h2])
   }
-
+ 
   function Unpause() {
-    pause = 'off';  //permet la FONCTION Pause ()
+    pause = 'off';  
     looping = window.setInterval(loop, 125);
     TextHide([h1, h2])
   }
 
-
+  
    function RemoveClasses() {
     snake1.active = document.querySelectorAll('.active1');
     for (var i = 0; i < snake1.active.length; i++) {
@@ -296,7 +296,7 @@
       snake2.head[i].classList.remove('head2');
     }
   }
- 
+  
   function ResetChangedDir() {
     snake1.changedDir = 0;
     snake2.changedDir = 0;
@@ -306,16 +306,16 @@
   function MoveSnakes() {
     for (var i = 0; i < snakes.length; i++) {
       switch (snakes[i].dir) {
-       
-        case 'left':
         
+        case 'left':
+          
           if (snakes[i].Y % (tabY.length / tabX.length) == 0) {
-           
+            
             snakes[i].Y += (tabY.length / tabX.length) - 1;
           }
-         
+          
           else {
-         
+           
             snakes[i].Y -= 1;
           }
           break;
@@ -327,7 +327,7 @@
             snakes[i].Y += 1;
           }
           break;
-       
+        
         case 'top':
           if (snakes[i].X === 0) {
             snakes[i].X += tabX.length - 1;
@@ -335,7 +335,7 @@
             snakes[i].X -= 1;
           }
           break;
-       
+        
         case 'bottom':
           if (snakes[i].X === tabX.length - 1) {
             snakes[i].X -= tabX.length - 1;
@@ -350,13 +350,13 @@
     for (var i = 0; i < snakes.length; i++) {
       
       snakes[i].blocks.push(tabY[snakes[i].Y + snakes[i].X * (tabY.length / tabX.length)]);
-     
+      
       if (snakes[i].blocks.length > snakes[i].maxLength) {
         snakes[i].blocks.shift();
       }
     }
   }
- 
+  
   function AddClasses() {
     
     for (var i1 = 0; i1 < snake1.blocks.length; i1++) {
@@ -367,12 +367,12 @@
         } else {
           snake1.blocks[i1].classList.add('head1')
         }
-      
+     
       } else{
         snake1.blocks[i1].classList.add('active1');
       }
     }
-   
+    
     for (var i1 = 0; i1 < snake2.blocks.length; i1++) {
       if (snake2.blocks[i1] === snake2.blocks[snake2.blocks.length - 1]) {
         if (snake2.blocks[i1].classList.contains('head2')) {
@@ -385,12 +385,9 @@
       }
     }
   }
- 
+  
   function CheckCrash() {
-    // la classe .active_ est sur chacun des blocs de queue
-    // la classe .head_ est sur la tête
-    // En regardant s'il exsite des div avec plusieurs classes à la fois -
-    // on sait qui s'est cogné à quoi
+    
     if (document.querySelector('.head1.active1')) {
       snake1.crashSelf = true
     } else if (document.querySelector('.head1.active2')) {
@@ -405,7 +402,7 @@
       snake1.crashOpp = true
       snake2.crashOpp = true
     }
-   
+    
     if (snake1.crashSelf || snake1.crashOpp || snake2.crashSelf || snake2.crashOpp) {
       
       if ((snake1.crashSelf || snake1.crashOpp) && (snake2.crashSelf || snake2.crashOpp)) {
@@ -421,13 +418,13 @@
       }
       
       window.setTimeout(EndAnim, 400);
-   
+     
       window.setTimeout(function() {
         TextShow([h1, h2])
       }, 1000)
       
       window.clearInterval(looping);
-      pause=''; //empêche la FONCTION Pause
+      pause=''; 
     }
   }
   
@@ -443,45 +440,45 @@
       if (snakes[i].eat) {
         
         snakes[i].maxLength += 2
-     
+      
         snakes[i].eat = false
-    
+        
         NewPom()
       }
     }
   }
- 
+  
   function NewPom() {
-    
+   
     pom = document.querySelector('.pom');
     if (document.querySelector('.pom')) {
       pom.classList.remove('pom');
     }
-    // Génère aléatoirement les coordonnées de la nouvelle pomme ----
+    
     pomX = Math.floor(Math.random() * tabX.length);
     pomY = Math.floor(Math.random() * (tabY.length / tabX.length));
-    // Ajoute la classe .pom à l'élément correspondant dans `tabY` --
+    
     tabY[pomY + pomX * tabX.length].classList.add('pom');
   }
-  
+ 
   function EndAnim(turn) {
     if (!turn) {
       turn = 'on'
     }
     switch (turn) {
-      
+     
       case 'on':
-       
+        
         for (var i = 0; i < tabY.length; i++) {
           tabY[i].style.transitionDuration = '.6s';
           tabY[i].style.transitionTimingFunction = 'ease-in-out';
-         
+          
           tabY[i].classList.add('Ynone');
         }
         break;
-   
+      
       case 'off':
-        // Remet tout bien ......................
+
         for (var i = 0; i < tabY.length; i++) {
           tabY[i].style.transitionDuration = '';
           tabY[i].style.transitionTimingFunction = '';
@@ -493,20 +490,20 @@
   }
   
   function Events1(key) {
-   
+    
     if (snake1.changedDir === 0 && ((key === 81 && snake1.dir !== 'right') || (key === 68 && snake1.dir !== 'left') || (key === 90 && snake1.dir !== 'bottom') || (key === 83 && snake1.dir !== 'top'))) {
-      // Change la direction ....................
+      
       switch (key) {
         case 81: snake1.dir = 'left'; break;
         case 68: snake1.dir = 'right'; break;
         case 90: snake1.dir = 'top'; break;
         case 83: snake1.dir = 'bottom'; break;
       }
-      
+     
       snake1.changedDir = 1;
     }
   }
- 
+  
   function Events2(key) {
     if (snake2.changedDir === 0 && ((key === 37 && snake2.dir !== 'right') || (key === 39 && snake2.dir !== 'left') || (key === 38 && snake2.dir !== 'bottom') || (key === 40 && snake2.dir !== 'top'))) {
       switch (key) {
@@ -545,7 +542,7 @@
     }
   }
 
-  
+ 
   function TextTranlate(text, mode) {
     switch (mode) {
       case 'on':
@@ -579,6 +576,4 @@
   </script>
 </body>
 
-</html>
-  <script src="index.js"></script>
 </html>
